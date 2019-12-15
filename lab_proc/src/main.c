@@ -1,6 +1,9 @@
 #include "proc.h"
+#include "misc.h"
+#include "thread.h"
 
-int main(void)
+int main(int argc, char** argv)
 {
-	return EXIT_SUCCESS;
+	init_mutex();
+	return 0;
 }
