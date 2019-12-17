@@ -16,13 +16,14 @@ void exec_proc(const char* proc_name)
 	return;
 }
 
-void fork_proc()
+void fork_proc(const char* proc_name)
 {
 	int child_pid;
 
 	child_pid = fork();
 	if (child_pid == 0)
 		printf("This was printed by child %d\n", getpid());
+		exec_proc(proc_name);
 	else
 		printf("This was printed by parent %d\n", getpid());
 
