@@ -7,7 +7,7 @@ void init_mthreading()
     pthread_condvar_init(&condvar);
 }
 
-void atomic_msg_upd(const char* msg, int ipc_type)
+void atomic_msg_upd(const char* msg, int ipc_type) // replace signatures with void* ptr for pthread_create compatibility
 {
     pthread_mutex_lock(&mtx);
     
@@ -24,7 +24,15 @@ void atomic_msg_upd(const char* msg, int ipc_type)
 
 void msg_receiver()
 {
+    int ch_id;
 
+    ch_id = ChannelCreate(0);
+    printf("Channel id is %d\n", ch_id);
+
+    while (true)
+    {
+        // message receiving logic
+    }
 }
 
 void fifo_receiver(const char* name)
@@ -51,13 +59,16 @@ void smem_receiver()
 
 }
 
-void printer()
+void sync_printer()
 {
-    pthread_mutex_lock(&mtx);
+    while (true)
+    {
+        pthread_mutex_lock(&mtx);
 
-    while (!msg_ready) pthread_cond_wait(&condvar, &mtx);
+        while (!msg_ready) pthread_cond_wait(&condvar, &mtx);
 
-    printf("New message arrived at channel %d:\n%s\n", g_msg.ipc_type, g_msg.msg);
+        printf("New message arrived at channel type %d:\n%s\n", g_msg.ipc_type, g_msg.msg);
 
-    pthread_mutex_unlock(&mtx);
+        pthread_mutex_unlock(&mtx);
+    }
 }

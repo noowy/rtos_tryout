@@ -28,6 +28,6 @@ void sig_receiver();
 
 void smem_receiver();
 
-void printer();
+void sync_printer();
 
 #endif // RX_H

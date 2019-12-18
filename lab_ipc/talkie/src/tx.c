@@ -1,8 +1,13 @@
 #include "tx.h"
 
-void msg_send(const char* data, const char* address)
-{
+void msg_send(const char* data, int proc_id, int ch_id)
+{   
+    int conn_id;
+    char msg[];
+    char reply[255];
 
+    conn_id = ConnectAttach(0, proc_id, ch_id, 0, 0);
+    MsgSend(conn_id, msg, strlen(msg) + 1, reply, sizeof(reply));
 }
 
 void pipe_send(const char* data, const char* address)

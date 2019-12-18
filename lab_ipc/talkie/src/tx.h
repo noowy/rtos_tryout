@@ -3,7 +3,7 @@
 
 #include "pch.h"
 
-void msg_send(const char* data, const char* address);
+void msg_send(const char* data, int proc_id, int ch_id);
 
 void pipe_send(const char* data, const char* address);
 
