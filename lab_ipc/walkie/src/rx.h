@@ -20,9 +20,7 @@ void atomic_msg_upd(const char* msg, int ipc_type);
 
 void msg_receiver();
 
-void pipe_receiver(const char* name);
-
-void fifo_receiver();
+void fifo_receiver(const char* name);
 
 void mqueue_receiver();
 

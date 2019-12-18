@@ -27,14 +27,6 @@ void msg_receiver()
 
 }
 
-void pipe_receiver()
-{
-    char buf[]; // maybe 255
-
-    while (scanf("%s", buf))
-        printf("%s\n", buf);
-}
-
 void fifo_receiver(const char* name)
 {
     char buf[];
