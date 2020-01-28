@@ -2,9 +2,9 @@
 
 void post_data(const char* address)
 {
-    char curl_req[];
-    char buf[];
-    char data[];
+    char curl_req[255];
+    char buf[255];
+    char data[2048];
 
     while (gets(buf))
         strcat(data, buf);
