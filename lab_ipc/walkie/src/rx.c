@@ -63,12 +63,35 @@ void mqueue_receiver()
 
 void sig_receiver()
 {
+    sync_ipc_msg s_msg;
 
+    int sig;
+    sigset_t signals[] = { 20, 30 };
+
+    while (1)
+    {
+        sigwait(signals, &sig);
+
+        s_msg.msg = itoa(sig);
+        s_msg.ipc_type = IPC_SIG;
+
+        atomic_msg_upd((void*)s_msg);
+    }
 }
 
 void smem_receiver()
 {
+    int fd;
+    char* shared;
 
+    fd = shm_open("/stuff", O_RDONLY | O_CREAT, 0777)
+
+    shared = mmap(0, 512, PROT_READ, MAP_SHARED, fd, 0)
+
+    while (1)
+    {
+        // think how to check whether new info arrived
+    }
 }
 
 void sync_printer()

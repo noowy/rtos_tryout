@@ -16,13 +16,19 @@ void pipe_send(const char* data, const char* address)
     pipe(pipe_ends);
 
     const int fds = { pipe_ends[0], 1, 2};
-    char* const argv[] = { "/home/qnxuser/rtos_tryout/lab_ipc/http_tx/http_tx.out", address};
+    const char* argv[] = { "/home/qnxuser/rtos_tryout/lab_ipc/http_tx/http_tx.out", address};
 
-    spawnl(
+    spawnp(
         "/home/qnxuser/rtos_tryout/lab_ipc/http_tx/http_tx.out", 
         3,
-        fds
+        fds,
+        NULL,
+        argv,
+        NULL
     )
+
+    FILE* output = fdopen(pipe_ends[1])
+    fputs(output, data);
 }
 
 void fifo_send(const char* data, const char* address)
@@ -36,14 +42,23 @@ void mqueue_send(const char* data, const char* address)
 
 }
 
-void sig_send(const char* data, const char* address)
+void sig_send(int proc_id, int sig)
 {
-
+    kill(proc_id, sig);
 }
 
 void smem_send(const char* data, const char* address)
 {
+    int fd;
+    char* shared;
 
+    fd = shm_open(address, O_RDWR, 0777);
+    ftruncate(fd, strlen(data) + 1);
+
+    shared = mmap(0, strlen(data) + 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    strcpy(shared, data);
+
+    close(fd);
 }
 
 void sender()

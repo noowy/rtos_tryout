@@ -11,7 +11,7 @@ void fifo_send(const char* data, const char* address);
 
 void mqueue_send(const char* data, const char* address);
 
-void sig_send(const char* data, const char* address);
+void sig_send(int proc_id, int sig);
 
 void smem_send(const char* data, const char* address);
 
