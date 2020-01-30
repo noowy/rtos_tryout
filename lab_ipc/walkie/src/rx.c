@@ -14,9 +14,9 @@ void atomic_msg_upd(const char* msg, int ipc_type) // replace signatures with vo
     while (msg_ready) pthread_cond_wait(&condvar, &mtx); 
     
     free(g_msg.msg)
-    g_msg.msg = (char)malloc(sizeof(char) * strlen(msg) + 1); // +1 for the null-terminator
+    g_msg.msg = (char*)malloc(sizeof(char) * (strlen(msg) + 1)); // +1 for the null-terminator
     
-    strcpy(msg, g_msg.msg);
+    strcpy(g_msg.msg, msg);
     g_msg.ipc_type = ipc_type;
     
     msg_ready = true;
@@ -28,8 +28,10 @@ void msg_receiver()
 {
     int ch_id;
     int rcv_id;
+    
     char msg[255];
     char reply[] = "you may go now";
+    
     sync_ipc_msg s_msg;
 
     ch_id = ChannelCreate(0);
@@ -49,16 +51,17 @@ void msg_receiver()
 
 void fifo_receiver(const char* name)
 {
-    char buf[];
+    char buf[256];
     FILE* fifo = fopen(name, "r");
 
     while(fgets(buf, 255, fifo))
         atomic_msg_upd(buf, IPC_FIFO);
 }
 
-void mqueue_receiver()
+void mqueue_receiver(const char* name)
 {
-
+    if (mq_open(name, O_RDONLY))
+        mq_close(name);
 }
 
 void sig_receiver()
@@ -79,19 +82,31 @@ void sig_receiver()
     }
 }
 
-void smem_receiver()
+void smem_receiver(const char* name)
 {
     int fd;
     char* shared;
+    char buf[512];
+    sync_ipc_msg s_msg;
 
-    fd = shm_open("/stuff", O_RDONLY | O_CREAT, 0777)
+    fd = shm_open(name, O_RDONLY | O_CREAT, 0777)
 
     shared = mmap(0, 512, PROT_READ, MAP_SHARED, fd, 0)
 
     while (1)
     {
-        // think how to check whether new info arrived
+        if (!strcmp(buf, shared))
+            continue;
+
+        strcpy(buf, shared);
+        
+        s_msg.msg = buf;
+        s_msg.ipc_type = IPC_SMEM;
+        
+        atomic_msg_upd((void*)s_msg); 
     }
+
+    shm_unlink(name);
 }
 
 void sync_printer()

@@ -22,11 +22,11 @@ void msg_receiver();
 
 void fifo_receiver(const char* name);
 
-void mqueue_receiver();
+void mqueue_receiver(const char* name);
 
 void sig_receiver();
 
-void smem_receiver();
+void smem_receiver(const char* name);
 
 void sync_printer();
 

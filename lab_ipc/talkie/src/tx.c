@@ -52,6 +52,9 @@ void smem_send(const char* data, const char* address)
     int fd;
     char* shared;
 
+    if (strlen(data) >= 511)
+        data[511] = 0;
+    
     fd = shm_open(address, O_RDWR, 0777);
     ftruncate(fd, strlen(data) + 1);
 
