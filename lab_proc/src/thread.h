@@ -4,6 +4,7 @@
 #include "pch.h"
 
 static int imaginary_stack;
+static int dummy;
 
 static pthread_mutex_t mtx;
 
@@ -11,12 +12,12 @@ static sem_t sem;
 
 void init_thread_tu();
 
-void thread_signal(void* thread_id);
+void* thread_signal_sync(void* notused);
 
-void thread_signal_sync(void* thread_id);
+void* sync_producer(void* notused);
 
-void sync_producer();
+void* sync_consumer(void* notused);
 
-void sync_consumer();
+void threader();
 
 #endif // THREAD_H

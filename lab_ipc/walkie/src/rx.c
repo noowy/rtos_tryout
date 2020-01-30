@@ -2,17 +2,18 @@
 
 void init_mthreading()
 {
-    msg_ready = false;
-    pthread_mutex_init(&mtx);
-    pthread_condvar_init(&condvar);
+    msg_ready = 0;
+    pthread_mutex_init(&mtx, NULL);
+    pthread_cond_init(&condvar, NULL);
 }
 
-void atomic_msg_upd(const char* msg, int ipc_type) // replace signatures with void* ptr for pthread_create compatibility
+void* atomic_msg_upd(void* msg_data_raw) // NO DO NOT ! replace signatures with void* ptr for pthread_create compatibility
 {
     pthread_mutex_lock(&mtx);
+    sync_ipc_msg *msg_data = (sync_ipc_msg*)msg_data_raw;
     
     while (msg_ready) pthread_cond_wait(&condvar, &mtx); 
-    
+
     free(g_msg.msg)
     g_msg.msg = (char*)malloc(sizeof(char) * (strlen(msg) + 1)); // +1 for the null-terminator
     
@@ -55,7 +56,12 @@ void fifo_receiver(const char* name)
     FILE* fifo = fopen(name, "r");
 
     while(fgets(buf, 255, fifo))
-        atomic_msg_upd(buf, IPC_FIFO);
+    {
+        // this is wrong
+        msg_data->msg = buf;
+        msg_data->ipc_type = IPC_FIFO;
+        atomic_msg_upd((void*)msg_data);
+    }
 }
 
 void mqueue_receiver(const char* name)
@@ -123,4 +129,35 @@ void sync_printer()
         pthread_cond_signal(&condvar);
         pthread_mutex_unlock(&mtx);
     }
+}
+
+void start_receivers(int argc, char* argv[])
+{
+    char ch;
+
+    while ((ch = getopt(argc, argv, "mfqsh")) != -1)
+    {
+        switch (ch)
+        {
+            case 'm':
+                break;
+            case 'f':
+                break;
+            case 'q':
+                break;
+            case 's':
+                break;
+            case 'h':
+                break;
+            case '?':
+                return;
+            default:
+                abort();
+        }
+    }
+
+    while (scanf("%c", &ch)) 
+        if (ch == 'q') break;
+
+    return;
 }

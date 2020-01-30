@@ -6,4 +6,8 @@
 #include <stdlib.h>
 #include <semaphore.h>
 #include <string.h>
+<<<<<<< Updated upstream
 #include <signal.h>
+=======
+#include <sys/neutrino.h>
+>>>>>>> Stashed changes

@@ -4,6 +4,13 @@
 
 int main(int argc, char** argv)
 {
-	init_mutex();
-	return 0;
+    if (argc > 2)
+    {
+        processor(argv[1], argv[2]);
+	    return 0;
+    }
+
+    init_thread_tu();
+    threader();
+    return 0;
 }

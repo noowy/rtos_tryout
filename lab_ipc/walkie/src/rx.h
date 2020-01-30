@@ -2,21 +2,23 @@
 #define RX_H 
 #include "pch.h"
 
-bool msg_ready;
+int msg_ready;
 static pthread_mutex_t mtx; 
 static pthread_cond_t  condvar;
 
 enum ipc_type { IPC_FIFO, IPC_MSG, IPC_MQUEUE, IPC_SIG, IPC_SMEM };
 
-typedef struct sync_ipc_msg
+typedef struct 
 {
     char *msg;
     int ipc_type;
-} g_msg;
+} sync_ipc_msg;
+
+sync_ipc_msg g_msg;
 
 void init_mthreading();
 
-void atomic_msg_upd(const char* msg, int ipc_type);
+void* atomic_msg_upd(void *msg_data_raw);
 
 void msg_receiver();
 
@@ -29,5 +31,7 @@ void sig_receiver();
 void smem_receiver(const char* name);
 
 void sync_printer();
+
+void start_receivers(int argc, char* argv[]);
 
 #endif // RX_H
