@@ -15,6 +15,6 @@ void sig_send(int proc_id, int sig);
 
 void smem_send(const char* data, const char* address);
 
-void sender();
+void sender(int argc, char* argv[]);
 
 #endif // TX_H

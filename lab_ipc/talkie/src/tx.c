@@ -39,7 +39,8 @@ void fifo_send(const char* data, const char* address)
 
 void mqueue_send(const char* data, const char* address)
 {
-
+    mqd_t mqd = mq_open(address, O_WRONLY, NULL);
+    mq_send(mqd, data, (strlen(data)+ 1));
 }
 
 void sig_send(int proc_id, int sig)
@@ -55,7 +56,7 @@ void smem_send(const char* data, const char* address)
     if (strlen(data) >= 511)
         data[511] = 0;
     
-    fd = shm_open(address, O_RDWR, 0777);
+    fd = shm_open(address, O_WRONLY, 0777);
     ftruncate(fd, strlen(data) + 1);
 
     shared = mmap(0, strlen(data) + 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
@@ -64,7 +65,31 @@ void smem_send(const char* data, const char* address)
     close(fd);
 }
 
-void sender()
+void sender(int argc, char* argv[])
 {
-
+    while ((ch = getopt(argc, argv, "mfqsh")) != -1)
+    {
+        switch (ch)
+        {
+            case 'm':
+                msg_send(); // think about argument positioning and how exactly getopt works?
+                break;
+            case 'f':
+                fifo_send();
+                break;
+            case 'q':
+                mqueue_send();
+                break;
+            case 's':
+                sig_send();
+                break;
+            case 'h':
+                smem_send();
+                break;
+            case '?':
+                return;
+            default:
+                abort();
+        }
+    }
 }
