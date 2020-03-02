@@ -14,23 +14,23 @@ typedef struct
     int ipc_type;
 } sync_ipc_msg;
 
-sync_ipc_msg g_msg;
+static sync_ipc_msg g_msg;
 
 void init_mthreading();
 
-void* atomic_msg_upd(void *msg_data_raw);
+void atomic_msg_upd(const char* msg, int ipc_type);
 
-void msg_receiver();
+void* msg_receiver(void* is_dissmised);
 
-void fifo_receiver(const char* name);
+void* fifo_receiver(void* is_dissmised);
 
-void mqueue_receiver(const char* name);
+void* mqueue_receiver(void* is_dissmised);
 
-void sig_receiver();
+void* sig_receiver(void* is_dissmised);
 
-void smem_receiver(const char* name);
+void* smem_receiver(void* is_dissmised);
 
-void sync_printer();
+void* sync_printer(void* notused);
 
 void start_receivers(int argc, char* argv[]);
 

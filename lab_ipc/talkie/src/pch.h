@@ -1,4 +1,4 @@
-//#include <process.h>
+#include <process.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -7,3 +7,9 @@
 #include <semaphore.h>
 #include <signal.h>
 #include <sys/neutrino.h>
+#include <string.h>
+#include <mqueue.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <spawn.h>
+#include <errno.h>

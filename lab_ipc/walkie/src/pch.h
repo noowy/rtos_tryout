@@ -8,3 +8,8 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/neutrino.h>
+#include <string.h>
+#include <mqueue.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <errno.h>

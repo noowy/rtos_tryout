@@ -1,7 +1,11 @@
 #include "tx.h"
 
-void msg_send(const char* data, int proc_id, int ch_id)
+void msg_send(char* data, char* address)
 {   
+    // maybe should take address const and put it into variable string
+    int proc_id = atoi(strtok(address, ":"));
+    int ch_id = atoi(strtok(NULL, ":"));
+
     int conn_id;
     char reply[255];
 
@@ -15,36 +19,42 @@ void pipe_send(const char* data, const char* address)
     int pipe_ends[2];
     pipe(pipe_ends);
 
-    const int fds = { pipe_ends[0], 1, 2};
-    const char* argv[] = { "/home/qnxuser/rtos_tryout/lab_ipc/http_tx/http_tx.out", address};
+    const int fds[] = { pipe_ends[0], 1, 2 };
+    const char* argv[] = { "/home/qnxuser/http_tx.out", address }; // probably need constant pointer to char
 
     spawnp(
-        "/home/qnxuser/rtos_tryout/lab_ipc/http_tx/http_tx.out", 
+        "/home/qnxuser/http_tx.out", 
         3,
         fds,
         NULL,
         argv,
         NULL
-    )
+    );
 
-    FILE* output = fdopen(pipe_ends[1])
-    fputs(output, data);
+    FILE* output = fdopen(pipe_ends[1], "w");
+    fputs(data, output);
+    fclose(output);
 }
 
 void fifo_send(const char* data, const char* address)
 {
-    FILE* fifo = fopen(address, 'w');
-    fputs(fifo, data);
+    FILE* fifo = fopen(address, "w");
+    fputs(data, fifo);
+    fclose(fifo);
 }
 
 void mqueue_send(const char* data, const char* address)
 {
     mqd_t mqd = mq_open(address, O_WRONLY, NULL);
-    mq_send(mqd, data, (strlen(data)+ 1));
+    mq_send(mqd, data, (strlen(data)+ 1), 0);
+    mq_close(mqd);
 }
 
-void sig_send(int proc_id, int sig)
+void sig_send(const char* data, const char* address)
 {
+    int proc_id = atoi(address);
+    int sig = atoi(data);
+
     kill(proc_id, sig);
 }
 
@@ -52,9 +62,6 @@ void smem_send(const char* data, const char* address)
 {
     int fd;
     char* shared;
-
-    if (strlen(data) >= 511)
-        data[511] = 0;
     
     fd = shm_open(address, O_WRONLY, 0777);
     ftruncate(fd, strlen(data) + 1);
@@ -63,28 +70,31 @@ void smem_send(const char* data, const char* address)
     strcpy(shared, data);
 
     close(fd);
+    shm_unlink(address);
 }
 
 void sender(int argc, char* argv[])
 {
-    while ((ch = getopt(argc, argv, "mfqsh")) != -1)
+    char ch;
+
+    while ((ch = getopt(argc, argv, "m:f:q:s:h:")) != -1)
     {
         switch (ch)
         {
             case 'm':
-                msg_send(); // think about argument positioning and how exactly getopt works?
+                msg_send(argv[3], optarg); // think about argument positioning and how exactly getopt works?
                 break;
             case 'f':
-                fifo_send();
+                fifo_send(argv[3], optarg);
                 break;
             case 'q':
-                mqueue_send();
+                mqueue_send(argv[3], optarg);
                 break;
             case 's':
-                sig_send();
+                sig_send(argv[3], optarg);
                 break;
             case 'h':
-                smem_send();
+                smem_send(argv[3], optarg);
                 break;
             case '?':
                 return;
